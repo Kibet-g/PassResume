@@ -28,7 +28,7 @@ export default function Home() {
 
   const fetchAppStats = async () => {
     try {
-      const response = await fetch('http://127.0.0.1:5000/api/stats')
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:5000'}/api/stats`)
       if (response.ok) {
         const stats = await response.json()
         setAppStats(stats)
@@ -50,7 +50,7 @@ export default function Home() {
     setIsAnalyzing(true)
     try {
       // Get the current resume data from the database
-      const response = await axios.get(`http://127.0.0.1:5000/api/resume/${resumeData.resume_id}`)
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:5000'}/api/resume/${resumeData.resume_id}`)
       const resumeDetails = response.data
       
       setAnalysisResults({
@@ -74,7 +74,7 @@ export default function Home() {
     setIsGenerating(true)
     try {
       // Call the auto-improve endpoint
-      const response = await axios.post('http://127.0.0.1:5000/api/auto-improve-resume', {
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:5000'}/api/auto-improve-resume`, {
         resume_id: resumeData.resume_id
       })
       

@@ -19,15 +19,25 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 
 app = Flask(__name__)
-CORS(app)
+
+# Production-ready CORS configuration
+if os.environ.get('FLASK_ENV') == 'production':
+    # In production, specify allowed origins
+    CORS(app, origins=[
+        "https://your-frontend-domain.vercel.app",
+        "https://passresume.vercel.app"  # Update with your actual domain
+    ])
+else:
+    # In development, allow all origins
+    CORS(app)
 
 # Configuration
 UPLOAD_FOLDER = 'uploads'
 DATABASE = 'resume_auditor_enhanced.db'
 MODEL_FOLDER = 'models'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.config['SECRET_KEY'] = 'your-secret-key-change-in-production'  # Change this in production
-JWT_SECRET = 'jwt-secret-key-change-in-production'  # Change this in production
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your-secret-key-change-in-production')
+JWT_SECRET = os.environ.get('JWT_SECRET', 'jwt-secret-key-change-in-production')
 
 # Ensure directories exist
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)

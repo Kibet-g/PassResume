@@ -51,7 +51,7 @@ export default function ResumeEditor({ resumeId, originalText, onSave }: ResumeE
   const fetchEditSuggestions = async (editType: string) => {
     setLoading(true);
     try {
-      const response = await fetch('http://127.0.0.1:5000/api/edit-resume', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:5000'}/api/edit-resume`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -101,12 +101,12 @@ export default function ResumeEditor({ resumeId, originalText, onSave }: ResumeE
     setAutoImproving(true);
     try {
       // Fetch comprehensive suggestions for auto-improvement
-      const response = await fetch('http://127.0.0.1:5000/api/auto-improve-resume', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:5000'}/api/auto-improve-resume`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
           resume_id: resumeId,
           original_text: originalText
         }),

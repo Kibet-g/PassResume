@@ -42,7 +42,7 @@ export default function FileUpload({ onUploadSuccess }: FileUploadProps) {
         headers.Authorization = `Bearer ${token}`
       }
 
-      const response = await axios.post('http://127.0.0.1:5000/api/upload', formData, {
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:5000'}/api/upload`, formData, {
         headers,
       })
 
