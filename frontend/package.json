@@ -23,7 +23,9 @@
     "react-dropzone": "^14.2.3",
     "lucide-react": "^0.294.0",
     "clsx": "^2.0.0",
-    "tailwind-merge": "^2.0.0"
+    "tailwind-merge": "^2.0.0",
+    "@radix-ui/react-tabs": "^1.0.4",
+    "class-variance-authority": "^0.7.0"
   },
   "devDependencies": {
     "eslint": "^8",
