@@ -99,7 +99,7 @@ export default function Home() {
       window.URL.revokeObjectURL(url)
       
       // Update analysis results with new data
-      setAnalysisResults(prev => ({
+      setAnalysisResults((prev: any) => ({
         ...prev,
         ats_score: improvedData.final_ats_score,
         improvement_applied: true,
@@ -436,15 +436,18 @@ export default function Home() {
       {/* Authentication Modal */}
       {showAuthModal && (
         <AuthModal
-          mode={authModalMode}
+          isOpen={showAuthModal}
+          initialMode={authModalMode}
           onClose={() => setShowAuthModal(false)}
-          onSwitchMode={(mode) => setAuthModalMode(mode)}
         />
       )}
 
       {/* User Dashboard */}
       {showDashboard && (
-        <UserDashboard onClose={() => setShowDashboard(false)} />
+        <UserDashboard 
+          isOpen={showDashboard}
+          onClose={() => setShowDashboard(false)} 
+        />
       )}
     </div>
   )

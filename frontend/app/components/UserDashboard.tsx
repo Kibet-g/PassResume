@@ -127,6 +127,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ isOpen, onClose }) => {
               Sign Out
             </button>
             <button
+              title="Close dashboard"
               onClick={onClose}
               className="text-gray-400 hover:text-gray-600 transition-colors"
             >
@@ -254,6 +255,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ isOpen, onClose }) => {
             <div className="flex items-center justify-between p-4 border-b border-gray-200">
               <h3 className="text-lg font-semibold text-gray-900">Resume Details</h3>
               <button
+                title="Close resume details"
                 onClick={() => setSelectedResume(null)}
                 className="text-gray-400 hover:text-gray-600"
               >
