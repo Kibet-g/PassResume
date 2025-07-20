@@ -59,40 +59,40 @@ def init_db():
     conn.close()
 
 def extract_text_from_file(file_path, file_extension):
-    """Simple text extraction for demo purposes"""
+    """Extract text from uploaded files"""
     try:
         if file_extension == 'txt':
             with open(file_path, 'r', encoding='utf-8') as f:
                 return f.read()
+        elif file_extension == 'pdf':
+            try:
+                import pdfplumber
+                text = ""
+                with pdfplumber.open(file_path) as pdf:
+                    for page in pdf.pages:
+                        page_text = page.extract_text()
+                        if page_text:
+                            text += page_text + "\n"
+                return text.strip()
+            except ImportError:
+                print("pdfplumber not available, using basic extraction")
+                return "PDF text extraction requires pdfplumber library. Please install it with: pip install pdfplumber"
+        elif file_extension == 'docx':
+            try:
+                from docx import Document
+                doc = Document(file_path)
+                text = ""
+                for paragraph in doc.paragraphs:
+                    text += paragraph.text + "\n"
+                return text.strip()
+            except ImportError:
+                print("python-docx not available, using basic extraction")
+                return "DOCX text extraction requires python-docx library. Please install it with: pip install python-docx"
         else:
-            # For demo purposes, return a sample text
-            return """
-            John Doe
-            Software Engineer
-            Email: john.doe@email.com
-            Phone: (555) 123-4567
-            
-            EXPERIENCE
-            Senior Software Engineer at Tech Corp (2020-2023)
-            • Developed web applications using Python and JavaScript
-            • Led a team of 5 developers
-            • Improved system performance by 40%
-            
-            Software Engineer at StartupXYZ (2018-2020)
-            • Built REST APIs using Flask and Django
-            • Implemented automated testing procedures
-            • Collaborated with cross-functional teams
-            
-            EDUCATION
-            Bachelor of Science in Computer Science
-            University of Technology (2014-2018)
-            
-            SKILLS
-            Python, JavaScript, React, Flask, Django, SQL, Git
-            """
+            return "Unsupported file format"
     except Exception as e:
         print(f"Error extracting text: {e}")
-        return ""
+        return f"Error extracting text from file: {str(e)}"
 
 def analyze_ats_compliance(text):
     """Analyze resume for ATS compliance"""
