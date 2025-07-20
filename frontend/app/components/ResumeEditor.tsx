@@ -42,6 +42,7 @@ export default function ResumeEditor({ resumeId, originalText, onSave }: ResumeE
   const [activeTab, setActiveTab] = useState('edit');
   const [improvementScore, setImprovementScore] = useState(0);
   const [appliedSuggestions, setAppliedSuggestions] = useState<Set<number>>(new Set());
+  const [autoImproving, setAutoImproving] = useState(false);
 
   useEffect(() => {
     fetchEditSuggestions('general');
@@ -92,8 +93,65 @@ export default function ResumeEditor({ resumeId, originalText, onSave }: ResumeE
     }
     
     setEditedText(newText);
-    setAppliedSuggestions(prev => new Set([...prev, index]));
+    setAppliedSuggestions(prev => new Set(Array.from(prev).concat(index)));
     calculateImprovementScore(newText);
+  };
+
+  const autoImproveResume = async () => {
+    setAutoImproving(true);
+    try {
+      // Fetch comprehensive suggestions for auto-improvement
+      const response = await fetch('http://127.0.0.1:5000/api/auto-improve-resume', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          resume_id: resumeId,
+          original_text: originalText
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.improved_text) {
+          setEditedText(data.improved_text);
+          setSuggestions(data.applied_suggestions || []);
+          setAppliedSuggestions(new Set(data.applied_suggestions?.map((_: any, index: number) => index) || []));
+          calculateImprovementScore(data.improved_text);
+        }
+      } else {
+        // Fallback: Apply all current suggestions automatically
+        let improvedText = editedText;
+        const newAppliedSuggestions = new Set<number>();
+        
+        suggestions.forEach((suggestion, index) => {
+          if (!appliedSuggestions.has(index)) {
+            if (suggestion.type === 'keyword_addition' && suggestion.keyword) {
+              const skillsSection = improvedText.match(/(SKILLS|Skills|TECHNICAL SKILLS)[\s\S]*?(?=\n[A-Z]|\n\n|$)/i);
+              if (skillsSection) {
+                improvedText = improvedText.replace(skillsSection[0], skillsSection[0] + `, ${suggestion.keyword}`);
+              } else {
+                improvedText += `\n\nSKILLS\n• ${suggestion.keyword}`;
+              }
+            } else if (suggestion.type === 'formatting' && suggestion.example) {
+              improvedText += `\n\n${suggestion.example}`;
+            } else if (suggestion.type === 'structure' && suggestion.example) {
+              improvedText = `${suggestion.example}\n\n${improvedText}`;
+            }
+            newAppliedSuggestions.add(index);
+          }
+        });
+        
+        setEditedText(improvedText);
+        setAppliedSuggestions(prev => new Set([...Array.from(prev), ...Array.from(newAppliedSuggestions)]));
+        calculateImprovementScore(improvedText);
+      }
+    } catch (error) {
+      console.error('Error auto-improving resume:', error);
+    } finally {
+      setAutoImproving(false);
+    }
   };
 
   const calculateImprovementScore = (text: string) => {
@@ -146,14 +204,33 @@ export default function ResumeEditor({ resumeId, originalText, onSave }: ResumeE
             <Edit3 className="w-5 h-5" />
             AI-Powered Resume Editor
           </CardTitle>
-          <div className="flex items-center gap-4">
-            <Badge variant="outline" className="flex items-center gap-1">
-              <TrendingUp className="w-3 h-3" />
-              Improvement Score: {improvementScore}%
-            </Badge>
-            <Badge variant="outline">
-              Applied: {appliedSuggestions.size}/{suggestions.length} suggestions
-            </Badge>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Badge variant="outline" className="flex items-center gap-1">
+                <TrendingUp className="w-3 h-3" />
+                Improvement Score: {improvementScore}%
+              </Badge>
+              <Badge variant="outline">
+                Applied: {appliedSuggestions.size}/{suggestions.length} suggestions
+              </Badge>
+            </div>
+            <Button 
+              onClick={autoImproveResume}
+              disabled={autoImproving || suggestions.length === 0}
+              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold px-6 py-2 rounded-lg shadow-lg transition-all duration-200"
+            >
+              {autoImproving ? (
+                <>
+                  <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                  Auto-Improving...
+                </>
+              ) : (
+                <>
+                  <Star className="w-4 h-4 mr-2" />
+                  Auto-Improve Resume
+                </>
+              )}
+            </Button>
           </div>
         </CardHeader>
       </Card>
@@ -201,7 +278,7 @@ export default function ResumeEditor({ resumeId, originalText, onSave }: ResumeE
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg">AI Suggestions</CardTitle>
-                <div className="flex gap-2">
+                <div className="flex gap-2 flex-wrap">
                   <Button 
                     variant="outline" 
                     size="sm"
@@ -226,6 +303,21 @@ export default function ResumeEditor({ resumeId, originalText, onSave }: ResumeE
                   >
                     Content
                   </Button>
+                  {suggestions.length > 0 && appliedSuggestions.size < suggestions.length && (
+                    <Button 
+                      size="sm"
+                      onClick={() => {
+                        suggestions.forEach((suggestion, index) => {
+                          if (!appliedSuggestions.has(index)) {
+                            applySuggestion(suggestion, index);
+                          }
+                        });
+                      }}
+                      className="bg-green-600 hover:bg-green-700 text-white"
+                    >
+                      Apply All
+                    </Button>
+                  )}
                 </div>
               </CardHeader>
               <CardContent>
@@ -240,7 +332,9 @@ export default function ResumeEditor({ resumeId, originalText, onSave }: ResumeE
                       <Alert>
                         <CheckCircle className="w-4 h-4" />
                         <AlertDescription>
-                          Great! No immediate suggestions. Your resume looks good.
+                          {appliedSuggestions.size > 0 
+                            ? "Excellent! All suggestions have been applied. Your resume is optimized!" 
+                            : "Great! No immediate suggestions. Your resume looks good. Click 'Auto-Improve Resume' for comprehensive enhancement."}
                         </AlertDescription>
                       </Alert>
                     ) : (

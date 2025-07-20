@@ -2,7 +2,8 @@
 
 import { useCallback, useState } from 'react'
 import { useDropzone } from 'react-dropzone'
-import { Upload, FileText, AlertCircle, CheckCircle } from 'lucide-react'
+import { Upload, FileText, AlertCircle, CheckCircle, TrendingUp } from 'lucide-react'
+import { useAuth } from '../contexts/AuthContext'
 import axios from 'axios'
 
 interface FileUploadProps {
@@ -13,6 +14,10 @@ export default function FileUpload({ onUploadSuccess }: FileUploadProps) {
   const [isUploading, setIsUploading] = useState(false)
   const [uploadError, setUploadError] = useState<string | null>(null)
   const [uploadSuccess, setUploadSuccess] = useState(false)
+  const [autoImproved, setAutoImproved] = useState(false)
+  const [improvementDetails, setImprovementDetails] = useState<any>(null)
+  
+  const { token, isAuthenticated } = useAuth()
 
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
     const file = acceptedFiles[0]
@@ -21,21 +26,37 @@ export default function FileUpload({ onUploadSuccess }: FileUploadProps) {
     setIsUploading(true)
     setUploadError(null)
     setUploadSuccess(false)
+    setAutoImproved(false)
+    setImprovementDetails(null)
 
     const formData = new FormData()
     formData.append('file', file)
 
     try {
-      const response = await axios.post('/api/upload', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
+      const headers: any = {
+        'Content-Type': 'multipart/form-data',
+      }
+      
+      // Add authentication header if user is logged in
+      if (token) {
+        headers.Authorization = `Bearer ${token}`
+      }
+
+      const response = await axios.post('http://127.0.0.1:5000/api/upload', formData, {
+        headers,
       })
 
       setUploadSuccess(true)
+      
+      // Check if auto-improvement was applied
+      if (response.data.auto_improved) {
+        setAutoImproved(true)
+        setImprovementDetails(response.data)
+      }
+      
       setTimeout(() => {
         onUploadSuccess(response.data)
-      }, 1000)
+      }, 2000) // Increased delay to show improvement message
     } catch (error: any) {
       setUploadError(
         error.response?.data?.error || 'Failed to upload file. Please try again.'
@@ -43,7 +64,7 @@ export default function FileUpload({ onUploadSuccess }: FileUploadProps) {
     } finally {
       setIsUploading(false)
     }
-  }, [onUploadSuccess])
+  }, [onUploadSuccess, token])
 
   const { getRootProps, getInputProps, isDragActive, isDragReject } = useDropzone({
     onDrop,
@@ -62,6 +83,11 @@ export default function FileUpload({ onUploadSuccess }: FileUploadProps) {
         <p className="text-gray-600">
           Upload your resume in PDF or DOCX format to get started with the ATS analysis
         </p>
+        {isAuthenticated && (
+          <p className="text-sm text-green-600 mt-2">
+            ✅ Logged in - Your resume will be saved to your history
+          </p>
+        )}
       </div>
 
       <div
@@ -125,14 +151,41 @@ export default function FileUpload({ onUploadSuccess }: FileUploadProps) {
       )}
 
       {uploadSuccess && (
-        <div className="mt-4 p-4 bg-success-50 border border-success-200 rounded-lg">
-          <div className="flex items-center space-x-2">
-            <CheckCircle className="h-5 w-5 text-success-600" />
-            <p className="text-success-800 font-medium">Resume uploaded successfully!</p>
+        <div className="mt-4 space-y-3">
+          <div className="p-4 bg-success-50 border border-success-200 rounded-lg">
+            <div className="flex items-center space-x-2">
+              <CheckCircle className="h-5 w-5 text-success-600" />
+              <p className="text-success-800 font-medium">Resume uploaded successfully!</p>
+            </div>
+            <p className="text-success-700 text-sm mt-1">
+              {autoImproved ? 'Resume analyzed and automatically improved!' : 'Proceeding to the next step...'}
+            </p>
           </div>
-          <p className="text-success-700 text-sm mt-1">
-            Proceeding to the next step...
-          </p>
+
+          {autoImproved && improvementDetails && (
+            <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <div className="flex items-center space-x-2 mb-2">
+                <TrendingUp className="h-5 w-5 text-blue-600" />
+                <p className="text-blue-800 font-medium">Auto-Improvement Applied!</p>
+              </div>
+              <div className="text-sm text-blue-700 space-y-1">
+                <p>
+                  <strong>ATS Score:</strong> {improvementDetails.original_ats_score} → {improvementDetails.final_ats_score} 
+                  <span className="text-green-600 font-medium"> (+{improvementDetails.score_improvement})</span>
+                </p>
+                {improvementDetails.improvements_made && improvementDetails.improvements_made.length > 0 && (
+                  <div>
+                    <p className="font-medium mt-2">Improvements made:</p>
+                    <ul className="list-disc list-inside ml-2 space-y-1">
+                      {improvementDetails.improvements_made.map((improvement: string, index: number) => (
+                        <li key={index}>{improvement}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -140,9 +193,11 @@ export default function FileUpload({ onUploadSuccess }: FileUploadProps) {
         <h3 className="font-medium text-blue-900 mb-2">What happens next?</h3>
         <ul className="text-sm text-blue-800 space-y-1">
           <li>• Your resume will be parsed and analyzed for ATS compliance</li>
-          <li>• We'll extract key information like contact details, experience, and skills</li>
-          <li>• You'll get an initial ATS score based on formatting and structure</li>
-          <li>• Next, you can add a job description for keyword matching analysis</li>
+          <li>• We'll calculate an initial ATS score based on formatting and structure</li>
+          <li>• If your ATS score is below 70, we'll automatically apply improvements</li>
+          <li>• Auto-improvements include: professional formatting, bullet points, missing sections, and ATS keywords</li>
+          <li>• You can then add a job description for keyword matching analysis</li>
+          <li>• Use the AI Resume Editor for further manual customizations</li>
         </ul>
       </div>
     </div>
