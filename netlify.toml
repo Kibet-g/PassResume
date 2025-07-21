@@ -1,0 +1,18 @@
+[build]
+  base = "frontend"
+  command = "npm run build"
+  publish = "frontend/out"
+
+[build.environment]
+  NEXT_TELEMETRY_DISABLED = "1"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[context.production.environment]
+  NEXT_PUBLIC_API_URL = "https://your-backend-url.railway.app"
+
+[context.deploy-preview.environment]
+  NEXT_PUBLIC_API_URL = "https://your-backend-url.railway.app"
