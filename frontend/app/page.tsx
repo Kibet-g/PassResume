@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Upload, FileText, Target, Zap, Github, Star, Brain, Shield, Download, TrendingUp, Database, CheckCircle, User, LogIn } from 'lucide-react'
+import { Upload, FileText, Target, Zap, Star, Brain, Shield, Download, TrendingUp, Database, CheckCircle, User, LogIn } from 'lucide-react'
 import FileUpload from './components/FileUpload'
 import AuthModal from './components/AuthModal'
 import UserDashboard from './components/UserDashboard'
@@ -187,16 +187,6 @@ export default function Home() {
                   </button>
                 </div>
               )}
-              
-              <a
-                href="https://github.com/Kibet-g/PassResume"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
-              >
-                <Github className="h-5 w-5" />
-                <span className="hidden sm:inline">GitHub</span>
-              </a>
             </div>
           </div>
         </div>
@@ -419,15 +409,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center">
             <p className="text-gray-600 text-sm">
-              Built with ❤️ for job seekers. 
-              <a 
-                href="https://github.com/Kibet-g/PassResume" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-primary-600 hover:text-primary-700 ml-1"
-              >
-                Open source on GitHub
-              </a>
+              Built with ❤️ for job seekers.
             </p>
           </div>
         </div>

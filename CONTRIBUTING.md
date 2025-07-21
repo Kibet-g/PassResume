@@ -4,19 +4,25 @@ Thank you for your interest in contributing to Open Resume Auditor! This documen
 
 ## 🤝 How to Contribute
 
+# Contributing to Open Resume Auditor
+
+Thank you for your interest in contributing to Open Resume Auditor! This document provides guidelines for contributing to the project.
+
+## 🤝 How to Contribute
+
 ### Reporting Issues
-- Use the GitHub issue tracker to report bugs
+- Contact the development team to report bugs
 - Include detailed steps to reproduce the issue
 - Provide information about your environment (OS, Python/Node.js versions)
 
 ### Suggesting Features
-- Open an issue with the "feature request" label
+- Reach out to the team with feature requests
 - Describe the feature and its benefits
 - Include mockups or examples if applicable
 
 ### Code Contributions
 
-1. **Fork the repository**
+1. **Contact the team for access**
 2. **Create a feature branch**
    ```bash
    git checkout -b feature/your-feature-name
@@ -27,11 +33,7 @@ Thank you for your interest in contributing to Open Resume Auditor! This documen
    ```bash
    git commit -m "Add: feature description"
    ```
-6. **Push to your fork**
-   ```bash
-   git push origin feature/your-feature-name
-   ```
-7. **Create a Pull Request**
+6. **Submit your changes for review**
 
 ## 🏗️ Development Setup
 
@@ -120,9 +122,9 @@ We're especially looking for contributions in:
 
 ## 📞 Getting Help
 
-- Join our discussions in GitHub Discussions
-- Ask questions in issues with the "question" label
-- Check existing documentation and issues first
+- Contact the development team directly
+- Email for questions and support
+- Check existing documentation first
 
 ## 🏆 Recognition
 

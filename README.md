@@ -57,7 +57,7 @@ chmod +x setup.sh
 
 1. **Clone the repository:**
 ```bash
-git clone https://github.com/yourusername/open-resume-auditor.git
+# Repository is private - contact owner for access
 cd open-resume-auditor
 ```
 
@@ -149,9 +149,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 If you encounter any issues or have questions:
 
-1. Check the [Issues](https://github.com/yourusername/open-resume-auditor/issues) page
-2. Create a new issue with detailed information
-3. Join our community discussions
+1. Contact the development team directly
+2. Check the documentation for troubleshooting
+3. Reach out via email for technical support
 
 ## 🙏 Acknowledgments
 
