@@ -24,8 +24,8 @@ app = Flask(__name__)
 if os.environ.get('FLASK_ENV') == 'production':
     # In production, specify allowed origins
     CORS(app, origins=[
-        "https://your-frontend-domain.vercel.app",
-        "https://passresume.vercel.app"  # Update with your actual domain
+        "https://passresume.netlify.app",
+        "https://your-frontend-domain.vercel.app"  # Keep as backup
     ])
 else:
     # In development, allow all origins
@@ -1604,6 +1604,33 @@ def health_check():
         'database_connected': True,
         'timestamp': datetime.now().isoformat()
     })
+
+@app.route('/api/init-db', methods=['POST'])
+def manual_init_db():
+    """Manual database initialization endpoint"""
+    try:
+        init_db()
+        ml_analyzer.train_model()
+        return jsonify({
+            'status': 'success',
+            'message': 'Database initialized successfully',
+            'timestamp': datetime.now().isoformat()
+        })
+    except Exception as e:
+        logger.error(f"Error initializing database: {e}")
+        return jsonify({
+            'status': 'error',
+            'message': f'Database initialization failed: {str(e)}',
+            'timestamp': datetime.now().isoformat()
+        }), 500
+
+# Initialize database and train model on startup (for production)
+try:
+    init_db()
+    ml_analyzer.train_model()
+    logger.info("Database and ML model initialized successfully")
+except Exception as e:
+    logger.error(f"Error during startup initialization: {e}")
 
 # Initialize database and train model on startup
 if __name__ == '__main__':
