@@ -18,6 +18,14 @@ import jwt
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 
+# Import enhanced AI modules
+from ai_enhanced_analyzer import (
+    IntelligentResumeScanner, 
+    SelfLearningAI, 
+    EnhancedResumeRefiner
+)
+from pdf_export_system import AdvancedPDFExporter, ResumeAnalyticsTracker
+
 app = Flask(__name__)
 
 # Production-ready CORS configuration
@@ -210,6 +218,13 @@ class MLResumeAnalyzer:
 
 # Initialize ML analyzer
 ml_analyzer = MLResumeAnalyzer()
+
+# Initialize Enhanced AI Components
+intelligent_scanner = IntelligentResumeScanner()
+self_learning_ai = SelfLearningAI(DATABASE)
+resume_refiner = EnhancedResumeRefiner()
+pdf_exporter = AdvancedPDFExporter()
+analytics_tracker = ResumeAnalyticsTracker(DATABASE)
 
 def init_db():
     """Initialize the enhanced database with ML tracking"""
@@ -1595,12 +1610,154 @@ def get_user_stats():
         logger.error(f"Error getting user stats: {e}")
         return jsonify({'error': 'Failed to retrieve user statistics'}), 500
 
+@app.route('/api/intelligent-scan', methods=['POST'])
+@token_required
+def intelligent_scan_resume():
+    """Enhanced AI scanning of resume sections"""
+    try:
+        data = request.get_json()
+        resume_text = data.get('resume_text', '')
+        
+        if not resume_text:
+            return jsonify({'error': 'Resume text is required'}), 400
+        
+        # Perform intelligent scanning
+        scan_results = intelligent_scanner.analyze_sections(resume_text)
+        quality_score = intelligent_scanner.calculate_quality_score(resume_text)
+        
+        # Log activity
+        log_user_activity(request.current_user_id, 'intelligent_scan', 
+                         {'quality_score': quality_score}, request.remote_addr)
+        
+        return jsonify({
+            'scan_results': scan_results,
+            'quality_score': quality_score,
+            'timestamp': datetime.now().isoformat()
+        })
+        
+    except Exception as e:
+        logger.error(f"Error in intelligent scan: {e}")
+        return jsonify({'error': 'Intelligent scan failed'}), 500
+
+@app.route('/api/refine-resume', methods=['POST'])
+@token_required
+def refine_resume():
+    """AI-powered resume refinement"""
+    try:
+        data = request.get_json()
+        resume_text = data.get('resume_text', '')
+        job_description = data.get('job_description', '')
+        
+        if not resume_text:
+            return jsonify({'error': 'Resume text is required'}), 400
+        
+        # Refine the resume
+        refined_resume = resume_refiner.refine_resume(resume_text, job_description)
+        
+        # Get improvement suggestions
+        improvements = resume_refiner.get_improvement_suggestions(resume_text)
+        
+        # Log activity
+        log_user_activity(request.current_user_id, 'resume_refinement', 
+                         {'improvements_count': len(improvements)}, request.remote_addr)
+        
+        return jsonify({
+            'refined_resume': refined_resume,
+            'improvements': improvements,
+            'timestamp': datetime.now().isoformat()
+        })
+        
+    except Exception as e:
+        logger.error(f"Error in resume refinement: {e}")
+        return jsonify({'error': 'Resume refinement failed'}), 500
+
+@app.route('/api/export-pdf', methods=['POST'])
+@token_required
+def export_resume_pdf():
+    """Export refined resume as PDF"""
+    try:
+        data = request.get_json()
+        resume_data = data.get('resume_data', {})
+        template_style = data.get('template_style', 'professional')
+        
+        if not resume_data:
+            return jsonify({'error': 'Resume data is required'}), 400
+        
+        # Generate PDF
+        pdf_buffer = pdf_exporter.export_resume(resume_data, template_style)
+        
+        # Track analytics
+        analytics_tracker.track_export(request.current_user_id, template_style)
+        
+        # Log activity
+        log_user_activity(request.current_user_id, 'pdf_export', 
+                         {'template_style': template_style}, request.remote_addr)
+        
+        # Return PDF as base64 for download
+        import base64
+        pdf_base64 = base64.b64encode(pdf_buffer.getvalue()).decode('utf-8')
+        
+        return jsonify({
+            'pdf_data': pdf_base64,
+            'filename': f"refined_resume_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf",
+            'timestamp': datetime.now().isoformat()
+        })
+        
+    except Exception as e:
+        logger.error(f"Error in PDF export: {e}")
+        return jsonify({'error': 'PDF export failed'}), 500
+
+@app.route('/api/ai-training-status', methods=['GET'])
+@token_required
+def get_ai_training_status():
+    """Get AI training and learning status"""
+    try:
+        training_stats = self_learning_ai.get_training_stats()
+        
+        return jsonify({
+            'training_stats': training_stats,
+            'last_training': self_learning_ai.last_training_time,
+            'model_version': self_learning_ai.model_version,
+            'timestamp': datetime.now().isoformat()
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting AI training status: {e}")
+        return jsonify({'error': 'Failed to get training status'}), 500
+
+@app.route('/api/trigger-ai-learning', methods=['POST'])
+@token_required
+def trigger_ai_learning():
+    """Manually trigger AI learning process"""
+    try:
+        # Trigger learning from database
+        self_learning_ai.learn_from_database()
+        
+        # Optionally trigger external data learning
+        external_learning = request.get_json().get('include_external', False)
+        if external_learning:
+            self_learning_ai.learn_from_external_data()
+        
+        # Log activity
+        log_user_activity(request.current_user_id, 'ai_learning_trigger', 
+                         {'external_learning': external_learning}, request.remote_addr)
+        
+        return jsonify({
+            'message': 'AI learning process triggered successfully',
+            'timestamp': datetime.now().isoformat()
+        })
+        
+    except Exception as e:
+        logger.error(f"Error triggering AI learning: {e}")
+        return jsonify({'error': 'AI learning trigger failed'}), 500
+
 @app.route('/health', methods=['GET'])
 def health_check():
     """Enhanced health check"""
     return jsonify({
         'status': 'healthy',
         'ml_model_loaded': ml_analyzer.ats_model is not None,
+        'ai_components_loaded': True,
         'database_connected': True,
         'timestamp': datetime.now().isoformat()
     })
@@ -1628,7 +1785,10 @@ def manual_init_db():
 try:
     init_db()
     ml_analyzer.train_model()
-    logger.info("Database and ML model initialized successfully")
+    
+    # Initialize enhanced AI components
+    self_learning_ai.learn_from_database()
+    logger.info("Database, ML model, and enhanced AI components initialized successfully")
 except Exception as e:
     logger.error(f"Error during startup initialization: {e}")
 
@@ -1636,4 +1796,12 @@ except Exception as e:
 if __name__ == '__main__':
     init_db()
     ml_analyzer.train_model()
+    
+    # Initialize enhanced AI components for development
+    try:
+        self_learning_ai.learn_from_database()
+        logger.info("Enhanced AI components initialized for development")
+    except Exception as e:
+        logger.error(f"Error initializing enhanced AI components: {e}")
+    
     app.run(debug=True, host='0.0.0.0', port=5000)
