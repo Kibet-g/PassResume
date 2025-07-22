@@ -36,7 +36,8 @@ export default function AIDashboard({ userRole = 'user' }: AIDashboardProps) {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/ai-training-status', {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:5000';
+      const response = await fetch(`${apiUrl}/api/ai-training-status`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -65,7 +66,8 @@ export default function AIDashboard({ userRole = 'user' }: AIDashboardProps) {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/trigger-ai-learning', {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:5000';
+      const response = await fetch(`${apiUrl}/api/trigger-ai-learning`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

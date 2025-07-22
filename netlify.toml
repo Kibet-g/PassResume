@@ -5,6 +5,7 @@
 
 [build.environment]
   NEXT_TELEMETRY_DISABLED = "1"
+  NODE_VERSION = "18"
 
 [[redirects]]
   from = "/*"
@@ -16,3 +17,18 @@
 
 [context.deploy-preview.environment]
   NEXT_PUBLIC_API_URL = "https://your-backend-url.railway.app"
+
+# Auto-deploy configuration
+[build.processing]
+  skip_processing = false
+
+[build.processing.css]
+  bundle = true
+  minify = true
+
+[build.processing.js]
+  bundle = true
+  minify = true
+
+[build.processing.html]
+  pretty_urls = true

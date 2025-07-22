@@ -107,13 +107,13 @@ export default function PDFExport({ resumeText, refinedResume, onExportComplete 
     }
 
     // Extract summary (look for summary/objective section)
-    const summaryMatch = text.match(/(?:summary|objective)[:\s]*(.*?)(?=\n\n|\nexperience|\neducation|$)/is);
+    const summaryMatch = text.match(/(?:summary|objective)[:\s]*(.*?)(?=\n\n|\nexperience|\neducation|$)/i);
     if (summaryMatch) {
       resumeData.summary = summaryMatch[1].trim();
     }
 
     // Extract skills (look for skills section)
-    const skillsMatch = text.match(/skills[:\s]*(.*?)(?=\n\n|\nexperience|\neducation|$)/is);
+    const skillsMatch = text.match(/skills[:\s]*(.*?)(?=\n\n|\nexperience|\neducation|$)/i);
     if (skillsMatch) {
       resumeData.skills = skillsMatch[1].split(/[,\n]/).map(skill => skill.trim()).filter(Boolean);
     }
@@ -134,17 +134,14 @@ export default function PDFExport({ resumeText, refinedResume, onExportComplete 
     setSuccess('');
 
     try {
-      const resumeData = parseResumeData(textToExport);
-      
-      const token = localStorage.getItem('token');
-      const response = await fetch('/api/export-pdf', {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:5000';
+      const response = await fetch(`${apiUrl}/api/export-pdf-public`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({ 
-          resume_data: resumeData,
+          resume_text: textToExport,
           template_style: selectedTemplate 
         })
       });

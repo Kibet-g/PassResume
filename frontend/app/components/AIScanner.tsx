@@ -38,7 +38,8 @@ export default function AIScanner({ resumeText, onScanComplete }: AIScannerProps
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/intelligent-scan', {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:5000';
+      const response = await fetch(`${apiUrl}/api/intelligent-scan`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

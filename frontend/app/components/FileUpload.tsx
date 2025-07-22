@@ -77,15 +77,16 @@ export default function FileUpload({ onUploadSuccess }: FileUploadProps) {
   })
 
   return (
-    <div className="card max-w-2xl mx-auto">
-      <div className="text-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Upload Your Resume</h2>
-        <p className="text-gray-600">
+    <div className="max-w-2xl mx-auto">
+      <div className="text-center mb-8">
+        <h2 className="text-2xl font-bold text-white mb-3">Upload Your Resume</h2>
+        <p className="text-gray-400">
           Upload your resume in PDF or DOCX format to get started with the ATS analysis
         </p>
         {isAuthenticated && (
-          <p className="text-sm text-green-600 mt-2">
-            ✅ Logged in - Your resume will be saved to your history
+          <p className="text-sm text-green-400 mt-2 flex items-center justify-center gap-2">
+            <CheckCircle className="h-4 w-4" />
+            Logged in - Your resume will be saved to your history
           </p>
         )}
       </div>
@@ -93,10 +94,10 @@ export default function FileUpload({ onUploadSuccess }: FileUploadProps) {
       <div
         {...getRootProps()}
         className={`
-          border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all duration-200
-          ${isDragActive && !isDragReject ? 'border-primary-400 bg-primary-50' : ''}
-          ${isDragReject ? 'border-red-400 bg-red-50' : ''}
-          ${!isDragActive ? 'border-gray-300 hover:border-gray-400' : ''}
+          border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all duration-200 bg-gray-800/50 backdrop-blur-sm
+          ${isDragActive && !isDragReject ? 'border-purple-400 bg-purple-500/10' : ''}
+          ${isDragReject ? 'border-red-400 bg-red-500/10' : ''}
+          ${!isDragActive ? 'border-gray-600 hover:border-gray-500' : ''}
           ${isUploading ? 'pointer-events-none opacity-50' : ''}
         `}
       >
@@ -104,32 +105,32 @@ export default function FileUpload({ onUploadSuccess }: FileUploadProps) {
         
         <div className="flex flex-col items-center space-y-4">
           {isUploading ? (
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+            <div className="w-12 h-12 border-2 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
           ) : uploadSuccess ? (
-            <CheckCircle className="h-12 w-12 text-success-600" />
+            <CheckCircle className="h-12 w-12 text-green-400" />
           ) : (
             <Upload className="h-12 w-12 text-gray-400" />
           )}
           
           <div>
             {isUploading ? (
-              <p className="text-lg font-medium text-gray-900">Uploading and parsing...</p>
+              <p className="text-lg font-medium text-white">Uploading and parsing...</p>
             ) : uploadSuccess ? (
-              <p className="text-lg font-medium text-success-600">Upload successful!</p>
+              <p className="text-lg font-medium text-green-400">Upload successful!</p>
             ) : isDragActive ? (
-              <p className="text-lg font-medium text-primary-600">Drop your resume here</p>
+              <p className="text-lg font-medium text-purple-400">Drop your resume here</p>
             ) : (
               <div>
-                <p className="text-lg font-medium text-gray-900">
+                <p className="text-lg font-medium text-white">
                   Drag and drop your resume here
                 </p>
-                <p className="text-sm text-gray-500 mt-1">or click to browse files</p>
+                <p className="text-sm text-gray-400 mt-1">or click to browse files</p>
               </div>
             )}
           </div>
           
           {!isUploading && !uploadSuccess && (
-            <div className="flex items-center space-x-4 text-sm text-gray-500">
+            <div className="flex items-center space-x-4 text-sm text-gray-400">
               <div className="flex items-center space-x-1">
                 <FileText className="h-4 w-4" />
                 <span>PDF, DOCX</span>
@@ -141,37 +142,37 @@ export default function FileUpload({ onUploadSuccess }: FileUploadProps) {
       </div>
 
       {uploadError && (
-        <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+        <div className="mt-4 p-4 bg-red-500/10 border border-red-500/30 rounded-lg">
           <div className="flex items-center space-x-2">
-            <AlertCircle className="h-5 w-5 text-red-600" />
-            <p className="text-red-800 font-medium">Upload Error</p>
+            <AlertCircle className="h-5 w-5 text-red-400" />
+            <p className="text-red-300 font-medium">Upload Error</p>
           </div>
-          <p className="text-red-700 text-sm mt-1">{uploadError}</p>
+          <p className="text-red-400 text-sm mt-1">{uploadError}</p>
         </div>
       )}
 
       {uploadSuccess && (
         <div className="mt-4 space-y-3">
-          <div className="p-4 bg-success-50 border border-success-200 rounded-lg">
+          <div className="p-4 bg-green-500/10 border border-green-500/30 rounded-lg">
             <div className="flex items-center space-x-2">
-              <CheckCircle className="h-5 w-5 text-success-600" />
-              <p className="text-success-800 font-medium">Resume uploaded successfully!</p>
+              <CheckCircle className="h-5 w-5 text-green-400" />
+              <p className="text-green-300 font-medium">Resume uploaded successfully!</p>
             </div>
-            <p className="text-success-700 text-sm mt-1">
+            <p className="text-green-400 text-sm mt-1">
               {autoImproved ? 'Resume analyzed and automatically improved!' : 'Proceeding to the next step...'}
             </p>
           </div>
 
           {autoImproved && improvementDetails && (
-            <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <div className="p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg">
               <div className="flex items-center space-x-2 mb-2">
-                <TrendingUp className="h-5 w-5 text-blue-600" />
-                <p className="text-blue-800 font-medium">Auto-Improvement Applied!</p>
+                <TrendingUp className="h-5 w-5 text-blue-400" />
+                <p className="text-blue-300 font-medium">Auto-Improvement Applied!</p>
               </div>
-              <div className="text-sm text-blue-700 space-y-1">
+              <div className="text-sm text-blue-400 space-y-1">
                 <p>
                   <strong>ATS Score:</strong> {improvementDetails.original_ats_score} → {improvementDetails.final_ats_score} 
-                  <span className="text-green-600 font-medium"> (+{improvementDetails.score_improvement})</span>
+                  <span className="text-green-400 font-medium"> (+{improvementDetails.score_improvement})</span>
                 </p>
                 {improvementDetails.improvements_made && improvementDetails.improvements_made.length > 0 && (
                   <div>
@@ -189,9 +190,9 @@ export default function FileUpload({ onUploadSuccess }: FileUploadProps) {
         </div>
       )}
 
-      <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-        <h3 className="font-medium text-blue-900 mb-2">What happens next?</h3>
-        <ul className="text-sm text-blue-800 space-y-1">
+      <div className="mt-6 p-4 bg-gray-800/50 border border-gray-700 rounded-lg">
+        <h3 className="font-medium text-white mb-2">What happens next?</h3>
+        <ul className="text-sm text-gray-300 space-y-1">
           <li>• Your resume will be parsed and analyzed for ATS compliance</li>
           <li>• We'll calculate an initial ATS score based on formatting and structure</li>
           <li>• If your ATS score is below 70, we'll automatically apply improvements</li>
