@@ -673,6 +673,75 @@ class EnhancedResumeRefiner:
             improvements.append("Consider using clear section headers (e.g., EXPERIENCE, EDUCATION)")
         
         return refined_text, improvements
+    
+    def get_improvement_suggestions(self, text: str) -> List[Dict]:
+        """Get detailed improvement suggestions for the resume"""
+        suggestions = []
+        
+        try:
+            # 1. Action verb improvements
+            for weak_verb in self.improvement_templates['action_verbs']['weak_verbs']:
+                if weak_verb in text.lower():
+                    strong_verb = np.random.choice(
+                        self.improvement_templates['action_verbs']['strong_verbs']
+                    )
+                    suggestions.append({
+                        'type': 'action_verb',
+                        'original': weak_verb,
+                        'improved': strong_verb,
+                        'reason': f"Replace weak verb '{weak_verb}' with stronger action verb '{strong_verb}'",
+                        'impact': 'medium'
+                    })
+            
+            # 2. Quantification suggestions
+            achievement_patterns = [
+                r'improved (\w+)',
+                r'increased (\w+)',
+                r'reduced (\w+)',
+                r'managed (\w+)'
+            ]
+            
+            for pattern in achievement_patterns:
+                matches = re.finditer(pattern, text, re.IGNORECASE)
+                for match in matches:
+                    original = match.group(0)
+                    item = match.group(1)
+                    improved = f"{original} by [X%/amount]"
+                    
+                    suggestions.append({
+                        'type': 'quantification',
+                        'original': original,
+                        'improved': improved,
+                        'reason': f"Add specific metrics to quantify the impact of '{original}'",
+                        'impact': 'high'
+                    })
+            
+            # 3. Formatting improvements
+            if not re.search(r'[•\-\*]', text):
+                suggestions.append({
+                    'type': 'formatting',
+                    'original': 'Plain text format',
+                    'improved': 'Bullet point format',
+                    'reason': 'Use bullet points to improve readability and ATS compatibility',
+                    'impact': 'medium'
+                })
+            
+            # 4. Section header improvements
+            if not re.search(r'^[A-Z\s]+$', text, re.MULTILINE):
+                suggestions.append({
+                    'type': 'formatting',
+                    'original': 'Unclear section headers',
+                    'improved': 'Clear section headers (EXPERIENCE, EDUCATION, SKILLS)',
+                    'reason': 'Use clear, uppercase section headers for better ATS parsing',
+                    'impact': 'medium'
+                })
+            
+            # Limit to top 10 suggestions to avoid overwhelming the user
+            return suggestions[:10]
+            
+        except Exception as e:
+            logger.error(f"Error getting improvement suggestions: {e}")
+            return []
 
 class PDFExportSystem:
     """System for exporting refined resumes as high-quality PDFs"""
