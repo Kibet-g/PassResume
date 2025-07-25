@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Upload, FileText, Target, Zap, Star, Brain, Shield, Download, TrendingUp, Database, CheckCircle, User, LogIn, Wand2, Scan, ArrowRight, Sparkles, BarChart3, FileCheck, Rocket } from 'lucide-react'
+import { Upload, FileText, Target, Zap, Star, Brain, Shield, Download, TrendingUp, Database, CheckCircle, User, LogIn, Wand2, Scan, ArrowRight, Sparkles, BarChart3, FileCheck, Rocket, Briefcase } from 'lucide-react'
 import FileUpload from './components/FileUpload'
 import AuthModal from './components/AuthModal'
 import UserDashboard from './components/UserDashboard'
@@ -11,6 +11,9 @@ import PDFExport from './components/PDFExport'
 import AIDashboard from './components/AIDashboard'
 import AdminDashboard from './components/AdminDashboard'
 import AdvancedAIProcessor from './components/AdvancedAIProcessor'
+import JobMatcher from '../components/JobMatcher'
+import AICompleteWorkflow from '../components/AICompleteWorkflow'
+import CoverLetterGenerator from './components/CoverLetterGenerator'
 import { useAuth } from './contexts/AuthContext'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './components/ui/card'
@@ -32,7 +35,7 @@ export default function Home() {
   const [showAuthModal, setShowAuthModal] = useState(false)
   const [showDashboard, setShowDashboard] = useState(false)
   const [authModalMode, setAuthModalMode] = useState<'login' | 'signup'>('login')
-  const [activeTab, setActiveTab] = useState('upload')
+  const [activeTab, setActiveTab] = useState('ai-complete')
 
   const { user, isAuthenticated, loading } = useAuth()
 
@@ -267,18 +270,18 @@ export default function Home() {
             {/* CTA Button */}
             <div className="pt-4">
               <button
-                onClick={() => setActiveTab('upload')}
+                onClick={() => setActiveTab('ai-complete')}
                 className="group inline-flex items-center space-x-3 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-8 py-4 rounded-xl text-lg font-medium transition-all duration-200 shadow-lg hover:shadow-purple-500/25"
               >
-                <Upload className="h-5 w-5" />
-                <span>Start Optimizing</span>
+                <Zap className="h-5 w-5" />
+                <span>Start AI Complete Workflow</span>
                 <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
               </button>
             </div>
             
             {/* Process Steps */}
             <div className="pt-16">
-              <div className="grid md:grid-cols-4 gap-8">
+              <div className="grid md:grid-cols-5 gap-6">
                 <div className="group">
                   <div className="relative mb-4">
                     <div className="w-16 h-16 bg-gradient-to-br from-purple-500/20 to-purple-600/20 border border-purple-500/30 rounded-2xl flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-200">
@@ -290,7 +293,7 @@ export default function Home() {
                   </div>
                   <h3 className="text-lg font-semibold text-white mb-2">Upload</h3>
                   <p className="text-gray-400 text-sm">
-                    Drop your resume file and let our AI analyze it
+                    Upload your resume and AI extracts content
                   </p>
                 </div>
                 
@@ -303,9 +306,9 @@ export default function Home() {
                       2
                     </div>
                   </div>
-                  <h3 className="text-lg font-semibold text-white mb-2">Analyze</h3>
+                  <h3 className="text-lg font-semibold text-white mb-2">AI Scan</h3>
                   <p className="text-gray-400 text-sm">
-                    Get detailed ATS compatibility and improvement insights
+                    AI analyzes ATS friendliness automatically
                   </p>
                 </div>
                 
@@ -318,9 +321,9 @@ export default function Home() {
                       3
                     </div>
                   </div>
-                  <h3 className="text-lg font-semibold text-white mb-2">Optimize</h3>
+                  <h3 className="text-lg font-semibold text-white mb-2">AI Refine</h3>
                   <p className="text-gray-400 text-sm">
-                    AI-powered content enhancement and keyword optimization
+                    AI automatically optimizes and improves content
                   </p>
                 </div>
                 
@@ -333,9 +336,24 @@ export default function Home() {
                       4
                     </div>
                   </div>
-                  <h3 className="text-lg font-semibold text-white mb-2">Export</h3>
+                  <h3 className="text-lg font-semibold text-white mb-2">Download</h3>
                   <p className="text-gray-400 text-sm">
-                    Download your optimized resume in professional format
+                    Get your optimized resume instantly
+                  </p>
+                </div>
+
+                <div className="group">
+                  <div className="relative mb-4">
+                    <div className="w-16 h-16 bg-gradient-to-br from-pink-500/20 to-pink-600/20 border border-pink-500/30 rounded-2xl flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-200">
+                      <Briefcase className="h-8 w-8 text-pink-400" />
+                    </div>
+                    <div className="absolute -top-2 -right-2 w-6 h-6 bg-pink-500 rounded-full flex items-center justify-center text-xs font-bold text-white">
+                      5
+                    </div>
+                  </div>
+                  <h3 className="text-lg font-semibold text-white mb-2">Job Match</h3>
+                  <p className="text-gray-400 text-sm">
+                    AI suggests relevant job opportunities
                   </p>
                 </div>
               </div>
@@ -372,7 +390,14 @@ export default function Home() {
         <div className="bg-gray-900/50 border border-gray-700 rounded-2xl backdrop-blur-sm overflow-hidden">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <div className="border-b border-gray-700 bg-gray-900/30">
-              <TabsList className="grid w-full grid-cols-6 bg-transparent border-0 p-0">
+              <TabsList className="grid w-full grid-cols-9 bg-transparent border-0 p-0">
+                <TabsTrigger 
+                  value="ai-complete" 
+                  className="flex items-center gap-2 py-4 px-6 data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500/20 data-[state=active]:to-pink-500/20 data-[state=active]:text-purple-300 data-[state=active]:border-b-2 data-[state=active]:border-purple-500 text-gray-400 hover:text-gray-300 transition-all duration-200 rounded-none border-0"
+                >
+                  <Zap className="h-4 w-4" />
+                  <span className="hidden sm:inline">AI Complete</span>
+                </TabsTrigger>
                 <TabsTrigger 
                   value="upload" 
                   className="flex items-center gap-2 py-4 px-6 data-[state=active]:bg-purple-500/20 data-[state=active]:text-purple-300 data-[state=active]:border-b-2 data-[state=active]:border-purple-500 text-gray-400 hover:text-gray-300 transition-all duration-200 rounded-none border-0"
@@ -412,6 +437,22 @@ export default function Home() {
                   <span className="hidden sm:inline">Enhance</span>
                 </TabsTrigger>
                 <TabsTrigger 
+                  value="cover-letter" 
+                  disabled={!resumeText} 
+                  className="flex items-center gap-2 py-4 px-6 data-[state=active]:bg-indigo-500/20 data-[state=active]:text-indigo-300 data-[state=active]:border-b-2 data-[state=active]:border-indigo-500 text-gray-400 hover:text-gray-300 transition-all duration-200 rounded-none border-0 disabled:opacity-50"
+                >
+                  <FileText className="h-4 w-4" />
+                  <span className="hidden sm:inline">Cover Letter</span>
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="jobs" 
+                  disabled={!resumeText} 
+                  className="flex items-center gap-2 py-4 px-6 data-[state=active]:bg-yellow-500/20 data-[state=active]:text-yellow-300 data-[state=active]:border-b-2 data-[state=active]:border-yellow-500 text-gray-400 hover:text-gray-300 transition-all duration-200 rounded-none border-0 disabled:opacity-50"
+                >
+                  <Briefcase className="h-4 w-4" />
+                  <span className="hidden sm:inline">Jobs</span>
+                </TabsTrigger>
+                <TabsTrigger 
                   value="export" 
                   disabled={!resumeText} 
                   className="flex items-center gap-2 py-4 px-6 data-[state=active]:bg-orange-500/20 data-[state=active]:text-orange-300 data-[state=active]:border-b-2 data-[state=active]:border-orange-500 text-gray-400 hover:text-gray-300 transition-all duration-200 rounded-none border-0 disabled:opacity-50"
@@ -423,6 +464,14 @@ export default function Home() {
             </div>
 
             <div className="p-8">
+              <TabsContent value="ai-complete" className="space-y-6 mt-0">
+                <div className="text-center mb-8">
+                  <h3 className="text-2xl font-bold text-white mb-3">AI Complete Workflow</h3>
+                  <p className="text-gray-400">Upload your resume and let AI handle everything: scan, optimize, and find jobs automatically!</p>
+                </div>
+                <AICompleteWorkflow />
+              </TabsContent>
+
               <TabsContent value="upload" className="space-y-6 mt-0">
                 <div className="text-center mb-8">
                   <h3 className="text-2xl font-bold text-white mb-3">Upload Your Resume</h3>
@@ -564,6 +613,27 @@ export default function Home() {
                 <ResumeRefiner 
                   resumeText={resumeText}
                   onRefinementComplete={handleRefinementComplete}
+                />
+              </TabsContent>
+
+              <TabsContent value="cover-letter" className="space-y-6 mt-0">
+                <div className="text-center mb-8">
+                  <h3 className="text-2xl font-bold text-white mb-3">AI Cover Letter Generator</h3>
+                  <p className="text-gray-400">Generate tailored cover letters based on your resume and job descriptions</p>
+                </div>
+                <CoverLetterGenerator 
+                  resumeData={resumeData}
+                />
+              </TabsContent>
+
+              <TabsContent value="jobs" className="space-y-6 mt-0">
+                <div className="text-center mb-8">
+                  <h3 className="text-2xl font-bold text-white mb-3">Intelligent Job Matching</h3>
+                  <p className="text-gray-400">Find personalized job opportunities based on your resume analysis</p>
+                </div>
+                <JobMatcher 
+                  resumeText={resumeText}
+                  isAuthenticated={isAuthenticated}
                 />
               </TabsContent>
 

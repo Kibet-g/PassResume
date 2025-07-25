@@ -561,3 +561,88 @@ class ResumeAnalyticsTracker:
         except Exception as e:
             logger.error(f"Error getting export statistics: {e}")
             return {'total_exports': 0, 'template_usage': {}, 'most_popular_template': None}
+
+    def export_cover_letter_to_pdf(self, cover_letter_text: str, 
+                                  template_name: str = 'professional',
+                                  filename: Optional[str] = None) -> bytes:
+        """Export cover letter as PDF"""
+        try:
+            if filename is None:
+                filename = f"cover_letter_{template_name}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
+            
+            # Create PDF buffer
+            from io import BytesIO
+            buffer = BytesIO()
+            
+            # Create document
+            doc = SimpleDocTemplate(
+                buffer,
+                pagesize=letter,
+                rightMargin=72,
+                leftMargin=72,
+                topMargin=72,
+                bottomMargin=72
+            )
+            
+            # Get template configuration
+            template_config = self.templates.get(template_name, self.templates['professional'])
+            
+            # Create styles
+            styles = getSampleStyleSheet()
+            
+            # Custom styles for cover letter
+            title_style = ParagraphStyle(
+                'CoverLetterTitle',
+                parent=styles['Heading1'],
+                fontSize=16,
+                spaceAfter=20,
+                textColor=template_config['colors']['primary'],
+                fontName=template_config['fonts']['header']
+            )
+            
+            body_style = ParagraphStyle(
+                'CoverLetterBody',
+                parent=styles['Normal'],
+                fontSize=11,
+                spaceAfter=12,
+                leading=14,
+                textColor=template_config['colors']['text'],
+                fontName=template_config['fonts']['body']
+            )
+            
+            # Build content
+            elements = []
+            
+            # Parse cover letter content
+            lines = cover_letter_text.split('\n')
+            current_paragraph = []
+            
+            for line in lines:
+                line = line.strip()
+                if not line:
+                    if current_paragraph:
+                        # End of paragraph
+                        paragraph_text = ' '.join(current_paragraph)
+                        elements.append(Paragraph(paragraph_text, body_style))
+                        elements.append(Spacer(1, 12))
+                        current_paragraph = []
+                else:
+                    current_paragraph.append(line)
+            
+            # Add final paragraph if exists
+            if current_paragraph:
+                paragraph_text = ' '.join(current_paragraph)
+                elements.append(Paragraph(paragraph_text, body_style))
+            
+            # Build PDF
+            doc.build(elements)
+            
+            # Get PDF data
+            pdf_data = buffer.getvalue()
+            buffer.close()
+            
+            return pdf_data
+            
+        except Exception as e:
+            logger.error(f"Error exporting cover letter to PDF: {e}")
+            raise Exception(f"PDF export failed: {str(e)}")

@@ -1,20 +1,19 @@
-# Open Resume Auditor 📄✨
+# PassResume - AI-Powered Resume Optimizer 🚀
 
-An AI-powered resume auditing tool that helps job seekers optimize their resumes for Applicant Tracking Systems (ATS) and improve their chances of landing interviews.
+**Latest Update**: Advanced AI Processing System with automatic GitHub deployments enabled!
 
-![Open Resume Auditor](https://img.shields.io/badge/Status-MVP-green)
-![License](https://img.shields.io/badge/License-MIT-blue)
-![Python](https://img.shields.io/badge/Python-3.8+-blue)
-![Next.js](https://img.shields.io/badge/Next.js-14-black)
+## Features
+- ✅ ATS Resume Analysis
+- ✅ AI-Powered Improvements  
+- ✅ Advanced AI Processing (NEW!)
+- ✅ Admin Dashboard (NEW!)
+- ✅ Automatic Deployments (NEW!)
 
-## 🚀 Features
+## Live Demo
+🌐 **Production**: https://passresume.netlify.app
 
-- **ATS Compliance Scoring**: Get a comprehensive score based on resume structure and formatting
-- **Keyword Analysis**: Compare your resume against job descriptions to identify missing keywords
-- **AI-Powered Suggestions**: Receive intelligent recommendations for resume improvement
-- **File Support**: Upload PDF and DOCX resume formats
-- **Modern UI**: Clean, responsive interface built with Next.js and Tailwind CSS
-- **Real-time Analysis**: Instant feedback on resume quality
+---
+*Automatically deploys from GitHub main branch*
 
 ## 🛠️ Tech Stack
 
